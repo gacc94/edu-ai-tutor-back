@@ -9,6 +9,7 @@ async function bootstrap() {
 
     // Usando el método de conveniencia para obtener la configuración del servidor
     const { port, host } = config.getServerConfig();
+    const { name } = config.getEnvName();
 
     app.setGlobalPrefix('api/v1');
     app.enableCors({
@@ -18,7 +19,7 @@ async function bootstrap() {
 
     await app.listen(port);
     console.log(`Application is running on: ${host}:${port}`);
-    console.log(`Environment: ${config.get('env.name')}`);
+    console.log(`Environment: ${name}`);
 }
 
 bootstrap();
