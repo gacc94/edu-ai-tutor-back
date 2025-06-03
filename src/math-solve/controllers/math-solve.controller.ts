@@ -1,7 +1,7 @@
-import { Controller, Post, Body, UploadedFile, UseInterceptors } from '@nestjs/common';
+import { Controller, Post, Body, UploadedFiles, UseInterceptors } from '@nestjs/common';
 import { MathSolveService } from '../services/math-solve.service';
 import { MathSolveDto } from '../dtos/math-solve.dto';
-import { FileInterceptor } from '@nestjs/platform-express';
+import { FilesInterceptor } from '@nestjs/platform-express';
 import * as multer from 'multer';
 import { join } from 'path';
 
@@ -10,7 +10,8 @@ export class MathSolveController {
     constructor(private readonly mathSolveService: MathSolveService) {}
 
     @UseInterceptors(
-        FileInterceptor('file', {
+        FilesInterceptor('files', 10, {
+            // 'files' es el nombre del campo y 10 es el máximo de archivos
             storage: multer.diskStorage({
                 destination: join(`${process.cwd()}/uploads`),
                 filename: (req, file, cb) => {
@@ -29,19 +30,10 @@ export class MathSolveController {
         }),
     )
     @Post('chat')
-    solveMathProblem(@UploadedFile() file: Express.Multer.File, @Body() body: MathSolveDto) {
-        console.log({ body, file });
-        return {
-            message: 'Math problem solved',
-            body,
-            file: {
-                fileName: file.filename,
-                originalName: file.originalname,
-                size: file.size,
-                encoding: file.encoding,
-                mimetype: file.mimetype,
-                path: file.path,
-            },
-        };
+    solveMathProblem(@UploadedFiles() files: Array<Express.Multer.File>, @Body() body: MathSolveDto) {
+        console.log({ body, files });
+
+        const response = this.mathSolveService.solveMathProblem(body.prompt);
+        return response;
     }
 }
