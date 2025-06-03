@@ -1,8 +1,13 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
+import { AppConfigService } from './app-config/app-config.service';
 
 async function bootstrap() {
     const app = await NestFactory.create(AppModule);
+
+    const appConfig = app.get(AppConfigService);
+    const port = appConfig.get<number>('server.port');
+    const host = appConfig.get<string>('server.host');
 
     app.setGlobalPrefix('api/v1');
     app.enableCors({
@@ -10,8 +15,8 @@ async function bootstrap() {
         credentials: true,
     });
 
-    await app.listen(process.env.PORT ?? 3000);
-    console.log(`Application is running on: ${await app.getUrl()}`);
+    await app.listen(port);
+    console.log(`Application is running on: ${host}:${port}`);
 }
 
-(async () => await bootstrap())();
+bootstrap();
