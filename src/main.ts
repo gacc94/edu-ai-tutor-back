@@ -5,9 +5,10 @@ import { AppConfigService } from './app-config/app-config.service';
 async function bootstrap() {
     const app = await NestFactory.create(AppModule);
 
-    const appConfig = app.get(AppConfigService);
-    const port = appConfig.get<number>('server.port');
-    const host = appConfig.get<string>('server.host');
+    const config = app.get(AppConfigService);
+
+    // Usando el método de conveniencia para obtener la configuración del servidor
+    const { port, host } = config.getServerConfig();
 
     app.setGlobalPrefix('api/v1');
     app.enableCors({
@@ -17,6 +18,7 @@ async function bootstrap() {
 
     await app.listen(port);
     console.log(`Application is running on: ${host}:${port}`);
+    console.log(`Environment: ${config.get('env.name')}`);
 }
 
 bootstrap();

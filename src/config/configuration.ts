@@ -4,7 +4,7 @@ import { join } from 'path';
 import { existsSync } from 'fs';
 
 export default () => {
-    const nodeEnv = process.env.NODE_ENV || 'dev';
+    const nodeEnv = process.env.NODE_ENV ?? 'dev';
     const baseConfigPath = join(process.cwd(), 'environments/env.yml');
     const envConfigPath = join(process.cwd(), `environments/env.${nodeEnv}.yml`);
 
