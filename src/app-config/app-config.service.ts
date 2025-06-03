@@ -1,25 +1,24 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { ServerConfig, DatabaseConfig, ConfigKey, ConfigValue } from '../config/config.types';
+import { AppConfig, ServerConfig, DatabaseConfig, EnvConfig } from 'src/config/schema';
 
 @Injectable()
 export class AppConfigService {
-    constructor(private readonly configService: ConfigService) {}
+    constructor(private readonly configService: ConfigService<AppConfig, true>) {}
 
     /**
      * Obtiene un valor de configuración tipado
      * @param key Ruta de la clave de configuración (ej: 'server.port')
      * @returns El valor de configuración tipado
      */
-    get<T extends ConfigKey>(key: T): ConfigValue<T> {
+    get<T extends keyof AppConfig>(key: T): AppConfig[T] {
         const value = this.configService.get(key);
         if (value === undefined || value === null) {
             throw new Error(`Configuration key "${key}" not found`);
         }
-        return value as ConfigValue<T>;
+        return value as AppConfig[T];
     }
 
-    // Métodos de conveniencia para acceder a secciones comunes
     getServerConfig(): ServerConfig {
         return this.get('server');
     }
@@ -28,12 +27,7 @@ export class AppConfigService {
         return this.get('database');
     }
 
-    // Métodos específicos para propiedades comunes
-    getServerPort(): number {
-        return this.get('server.port');
-    }
-
-    getServerHost(): string {
-        return this.get('server.host');
+    getEnvName(): EnvConfig {
+        return this.get('env');
     }
 }
