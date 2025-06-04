@@ -5,7 +5,7 @@ import { MathSolveUseCase } from '../uses-cases/math-solve.use-case';
 export class MathSolveService {
     constructor(private readonly mathSolveUseCase: MathSolveUseCase) {}
 
-    solveMathProblem(prompt: string) {
-        return this.mathSolveUseCase.execute(prompt);
+    solveMathProblem(prompt: string, files: Array<Express.Multer.File>) {
+        return this.mathSolveUseCase.execute(prompt, files);
     }
 }

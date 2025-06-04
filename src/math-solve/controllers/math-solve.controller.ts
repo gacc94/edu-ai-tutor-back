@@ -11,29 +11,38 @@ export class MathSolveController {
 
     @UseInterceptors(
         FilesInterceptor('files', 10, {
-            // 'files' es el nombre del campo y 10 es el máximo de archivos
-            storage: multer.diskStorage({
-                destination: join(`${process.cwd()}/uploads`),
-                filename: (req, file, cb) => {
-                    cb(null, Date.now() + '-' + file.originalname);
-                },
-            }),
-            limits: {
-                fileSize: 1024 * 1024 * 5,
-            },
-            fileFilter: (req, file, callback) => {
-                if (!file.originalname.match(/\.(jpg|jpeg|png|gif)$/)) {
-                    return callback(new Error('Only image files are allowed!'), false);
+            storage: multer.memoryStorage(),
+            limits: { fileSize: 5 * 1024 * 1024 },
+            fileFilter: (req, file, cb) => {
+                if (!file.originalname.match(/\.(jpg|jpeg|png|gif|pdf|doc|docx)$/)) {
+                    return cb(new Error('Only image, PDF, Word files are allowed!'), false);
                 }
-                callback(null, true);
+                cb(null, true);
             },
         }),
     )
+    // @UseInterceptors(
+    //     FilesInterceptor('files', 10, {
+    //         // 'files' es el nombre del campo y 10 es el máximo de archivos
+    //         storage: multer.diskStorage({
+    //             destination: join(`${process.cwd()}/uploads`),
+    //             filename: (req, file, cb) => {
+    //                 cb(null, Date.now() + '-' + file.originalname);
+    //             },
+    //         }),
+    //         limits: {
+    //             fileSize: 1024 * 1024 * 5,
+    //         },
+    //         fileFilter: (req, file, callback) => {
+    //             if (!file.originalname.match(/\.(jpg|jpeg|png|gif)$/)) {
+    //                 return callback(new Error('Only image files are allowed!'), false);
+    //             }
+    //             callback(null, true);
+    //         },
+    //     }),
+    // )
     @Post('chat')
     solveMathProblem(@UploadedFiles() files: Array<Express.Multer.File>, @Body() body: MathSolveDto) {
-        console.log({ body, files });
-
-        const response = this.mathSolveService.solveMathProblem(body.prompt);
-        return response;
+        return this.mathSolveService.solveMathProblem(body.prompt, files);
     }
 }
