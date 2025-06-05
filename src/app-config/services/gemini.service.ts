@@ -1,18 +1,17 @@
 import { Injectable } from '@nestjs/common';
 import { AppConfigService } from './app-config.service';
-import { GeminiConfig } from 'src/config/schema';
 import { GoogleGenAI } from '@google/genai';
 
 @Injectable()
 export class GeminiService {
-    private readonly geminiConfig: GeminiConfig;
-
-    constructor(private readonly appConfigService: AppConfigService) {
-        this.geminiConfig = this.appConfigService.get('gemini');
-    }
+    constructor(private readonly appConfigService: AppConfigService) {}
 
     get gemini(): GoogleGenAI {
-        const { apiKey } = this.geminiConfig;
+        const apiKey = this.appConfigService.get('gemini').apiKey;
         return new GoogleGenAI({ apiKey });
+    }
+
+    get model(): string {
+        return this.appConfigService.get('gemini').model;
     }
 }
