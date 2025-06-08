@@ -32,7 +32,11 @@ export function formatResponse<T>(data: T, options: IApiResponseOptions = {}): I
     };
 }
 
-export function formatErrorResponse(error: Error | string, statusCode: number = 500, req?: Request): IApiResponse<null> {
+export function formatErrorResponse(
+    error: Error | string,
+    statusCode: number = 500,
+    req?: Request,
+): IApiResponse<null> {
     const errorMessage = error instanceof Error ? error.message : error;
 
     return {

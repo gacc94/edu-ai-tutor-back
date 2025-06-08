@@ -15,7 +15,7 @@ const DatabaseSchema = z.object({
 });
 
 const EnvSchema = z.object({
-    name: z.enum(['local', 'dev', 'prod', 'test']),
+    name: z.enum(['local', 'dev', 'prod']),
 });
 
 const GeminiSchema = z.object({
