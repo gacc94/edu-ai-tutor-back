@@ -29,17 +29,25 @@ const GeminiSchema = z.object({
     stopSequences: z.array(z.string()).default([]),
 });
 
+const LoggingSchema = z.object({
+    level: z.enum(['debug', 'info', 'warn', 'error']).default('debug'),
+    format: z.enum(['combined', 'json']).default('combined'),
+});
+
+const CorsSchema = z.object({
+    enabled: z.boolean().default(true),
+    origins: z.array(z.string()).default(['http://localhost:3000', 'http://localhost:3001']),
+});
+
 // Esquema principal
 export const AppConfigSchema = z.object({
     server: ServerSchema,
     database: DatabaseSchema,
     env: EnvSchema,
     gemini: GeminiSchema,
+    logging: LoggingSchema,
+    cors: CorsSchema,
 });
 
 // Tipos inferidos
-export type ServerConfig = z.infer<typeof ServerSchema>;
-export type DatabaseConfig = z.infer<typeof DatabaseSchema>;
-export type EnvConfig = z.infer<typeof EnvSchema>;
-export type GeminiConfig = z.infer<typeof GeminiSchema>;
 export type AppConfig = z.infer<typeof AppConfigSchema>;

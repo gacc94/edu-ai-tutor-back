@@ -17,10 +17,18 @@ async function bootstrap() {
 
     app.setGlobalPrefix('api/v1');
     app.enableCors({
-        origin: '*',
+        origin: ['*'],
         credentials: true,
     });
-    app.useGlobalPipes(new ValidationPipe());
+
+    app.useGlobalPipes(
+        new ValidationPipe({
+            transform: true,
+            transformOptions: {
+                enableImplicitConversion: true,
+            },
+        }),
+    );
 
     await app.listen(port);
     console.log(`Application is running on: ${host}:${port}`);
