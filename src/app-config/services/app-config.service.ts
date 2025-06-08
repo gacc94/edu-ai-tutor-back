@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { AppConfig, ServerConfig, DatabaseConfig, EnvConfig } from 'src/config/schema';
+import { AppConfig } from 'src/config/schema';
 
 @Injectable()
 export class AppConfigService {
@@ -17,17 +17,5 @@ export class AppConfigService {
             throw new Error(`Configuration key "${key}" not found`);
         }
         return value as AppConfig[T];
-    }
-
-    getServerConfig(): ServerConfig {
-        return this.get('server');
-    }
-
-    getDatabaseConfig(): DatabaseConfig {
-        return this.get('database');
-    }
-
-    getEnvName(): EnvConfig {
-        return this.get('env');
     }
 }

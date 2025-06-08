@@ -8,8 +8,8 @@ async function bootstrap() {
     const app = await NestFactory.create(AppModule);
 
     const config = app.get(AppConfigService);
-    const { port, host } = config.getServerConfig();
-    const { name } = config.getEnvName();
+    const { port, host } = config.get('server');
+    const { name } = config.get('env');
 
     // Aumentar el límite de tamaño para archivos grandes si es necesario
     app.use(json({ limit: '50mb' }));

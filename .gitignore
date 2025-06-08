@@ -61,3 +61,13 @@ report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
 # Environments
 /environments/*
 !/environments/env.template.yml
+
+# Package
+package-lock.json
+pnpm-lock.yaml
+yarn.lock
+yarn-error.log
+pnpm-error.log
+pnpm-debug.log
+yarn-debug.log
+

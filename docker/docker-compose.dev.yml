@@ -1,0 +1,64 @@
+version: '3.8'
+
+services:
+    app:
+        build:
+            context: ../
+            dockerfile: Dockerfile
+        container_name: edu-ai-tutor-dev
+        ports:
+            - '3100:3100'
+        environment:
+            - NODE_ENV=development
+            - CONFIG_FILE=env.dev.yml
+        # volumes:
+        #     - .:/app
+        #     - /app/node_modules
+        #     - /app/dist
+        # depends_on:
+        #     postgres_db:
+        #         condition: service_healthy
+        networks:
+            - edu-ai-network
+        restart: unless-stopped
+        command: pnpm start:dev
+
+    # postgres_db:
+    #     image: postgres:15-alpine
+    #     container_name: postgres-dev
+    #     environment:
+    #         POSTGRES_DB: edu-ai-tutor
+    #         POSTGRES_USER: postgres
+    #         POSTGRES_PASSWORD: postgres
+    #     ports:
+    #         - '5432:5432'
+    #     volumes:
+    #         - postgres_dev_data:/var/lib/postgresql/data
+    #         - ./init-scripts:/docker-entrypoint-initdb.d
+    #     networks:
+    #         - edu-ai-network
+    #     healthcheck:
+    #         test: ['CMD-SHELL', 'pg_isready -U postgres -d edu-ai-tutor']
+    #         interval: 10s
+    #         timeout: 5s
+    #         retries: 5
+    #     restart: unless-stopped
+
+    # redis:
+    #     image: redis:7-alpine
+    #     container_name: redis-dev
+    #     ports:
+    #         - '6379:6379'
+    #     volumes:
+    #         - redis_dev_data:/data
+    #     networks:
+    #         - edu-ai-network
+    #     restart: unless-stopped
+
+# volumes:
+#     postgres_dev_data:
+#     redis_dev_data:
+
+networks:
+    edu-ai-network:
+        driver: bridge
