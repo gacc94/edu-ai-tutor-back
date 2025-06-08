@@ -1,25 +1,75 @@
-FROM node:22-alpine
+#* ================================
+#* BASE STAGE - Configuración común
+#* ================================
+FROM node:22-alpine AS base
 
+# Establecer directorio de trabajo
 WORKDIR /app
 
 # Habilitar y preparar pnpm
 RUN corepack enable && corepack prepare pnpm@latest --activate
 
-# Copiar archivos de configuración primero
-COPY pnpm-lock.yaml package.json ./
+# Copiar archivos de configuración de pnpm
+COPY package.json pnpm-lock.yaml ./
 
-# Instalar dependencias (incluyendo dependencias de producción)
+#* ================================
+#* DEPENDENCIES STAGE - Instalar dependencias
+#* ================================
+FROM base AS deps
+
+# Instalar todas las dependencias (dev + prod)
 RUN pnpm i --frozen-lockfile
 
-# Copiar el resto de archivos
+#* ================================
+#* DEVELOPMENT STAGE - Para desarrollo
+#* ================================
+FROM base AS development
+
+# Copiar node_modules desde deps
+COPY --from=deps /app/node_modules ./node_modules
+
+# Copiar código fuente
 COPY . .
 
-# Compilar el proyecto
+# Exponer puerto
+EXPOSE 3100
+
+# Comando para desarrollo con hot reload
+CMD ["pnpm", "start:dev"]
+
+#* ==================================
+#* BUILD STAGE - Construir aplicación
+#* ==================================
+FROM deps AS build
+
+COPY . .
+
+# Build de la aplicación
 RUN pnpm build
 
-ENV NODE_ENV=dev
-ENV NODE_ENV_PORT=3100
+#* ==================================
+#* PRODUCTION STAGE - Para producción
+#* ==================================
+FROM node:22-alpine AS production
 
-EXPOSE ${NODE_ENV_PORT}
+WORKDIR /app
 
-CMD ["pnpm", "start:dev"]
+# Habilitar pnpm
+RUN corepack enable && corepack prepare pnpm@latest --activate
+
+# Copiar el resultado del build y el package.json
+COPY --from=build /app/dist ./dist
+COPY --from=build /app/package.json ./package.json
+COPY --from=build /app/pnpm-lock.yaml ./pnpm-lock.yaml
+
+# Instalar solo dependencias de producción basado en el lockfile
+RUN pnpm i --prod --frozen-lockfile
+
+# Copiar archivos de configuración
+COPY --from=build /app/environments ./environments
+
+# Exponer puerto
+EXPOSE 3200
+
+# Comando para producción
+CMD ["node", "dist/main"]
