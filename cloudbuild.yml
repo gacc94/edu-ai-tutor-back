@@ -1,0 +1,39 @@
+# Define los pasos del build
+steps:
+    # Paso 1: Construir y subir la imagen
+    # Usa 'gcr.io/cloud-builders/docker' que es un ejecutor de Docker proporcionado por Google.
+    - name: 'gcr.io/cloud-builders/docker'
+      id: 'Build and Push Image' # Un ID para este paso
+      args: [
+              'build',
+              '--tag',
+              '${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPOSITORY_NAME}/${_IMAGE_NAME}:${_TAG}', # Etiqueta específica
+              '--tag',
+              '${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPOSITORY_NAME}/${_IMAGE_NAME}:${_IMAGE_TAG_PREFIX}-latest', # Etiqueta "latest" del entorno
+              '--build-arg',
+              'BUILDKIT_INLINE_CACHE=1', # Mejora el cacheo entre builds
+              '--cache-from',
+              '${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPOSITORY_NAME}/${_IMAGE_NAME}:${_IMAGE_TAG_PREFIX}-latest', # Usa la última imagen como caché
+              '--target',
+              '${_TARGET_STAGE}', # ¡LA CLAVE! Construye hasta un target específico
+              '.', # El contexto es el directorio actual
+          ]
+
+# Define las imágenes que este build creará. Esto las sube automáticamente a Artifact Registry.
+images:
+    - '${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPOSITORY_NAME}/${_IMAGE_NAME}:${_TAG}'
+    - '${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPOSITORY_NAME}/${_IMAGE_NAME}:${_IMAGE_TAG_PREFIX}-latest'
+
+# Define variables de substitución que puedes pasar al build
+substitutions:
+    _REGION: 'us-central1' # Región de tu Artifact Registry
+    _REPOSITORY_NAME: 'repositorio-edu-ai-tutor' # Nombre de tu repositorio
+    _IMAGE_NAME: 'edu-ai-tutor' # Nombre de tu imagen
+
+    # --- Variables que controlarás para cada build ---
+    _TARGET_STAGE: 'production' # Valor por defecto: construye la etapa de producción
+    _IMAGE_TAG_PREFIX: 'prod' # Prefijo para la etiqueta 'latest' (ej. prod-latest)
+    _TAG: 'latest' # Etiqueta específica, por defecto 'latest'
+
+options:
+    logging: CLOUD_LOGGING_ONLY # Envía logs solo a Cloud Logging

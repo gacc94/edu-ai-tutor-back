@@ -11,14 +11,17 @@ async function bootstrap() {
     const { port, host } = config.get('server');
     const { name } = config.get('env');
 
-    // Aumentar el límite de tamaño para archivos grandes si es necesario
     app.use(json({ limit: '50mb' }));
     app.use(urlencoded({ extended: true, limit: '50mb' }));
 
     app.setGlobalPrefix('api/v1');
     app.enableCors({
-        origin: ['*'],
+        origin: true,
+        methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
         credentials: true,
+        allowedHeaders: 'Content-Type, Accept, Authorization',
+        preflightContinue: false,
+        optionsSuccessStatus: 204,
     });
 
     app.useGlobalPipes(

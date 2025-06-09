@@ -18,12 +18,12 @@ COPY package.json pnpm-lock.yaml ./
 FROM base AS deps
 
 # Instalar todas las dependencias (dev + prod)
-RUN pnpm i --frozen-lockfile
+RUN pnpm i --frozen-lockfilez
 
 #* ================================
 #* DEVELOPMENT STAGE - Para desarrollo
 #* ================================
-FROM base AS development
+FROM deps AS development
 
 # Copiar node_modules desde deps
 COPY --from=deps /app/node_modules ./node_modules
