@@ -1,17 +1,18 @@
-import { Module } from '@nestjs/common';
+import { Module, Global } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
-import { AppConfigModule } from './app-config/app-config.module';
 import { MathSolveModule } from './math-solve/math-solve.module';
 import { SharedModule } from './shared/shared.module';
 import createConfigLoader from './app-config/env-configuration';
 
+const environment = process.env.NODE_ENV === 'prod' ? 'prod' : 'dev';
+
+@Global()
 @Module({
     imports: [
         ConfigModule.forRoot({
             isGlobal: true,
-            load: [createConfigLoader({ environmentName: process.env.NODE_ENV ?? 'dev' })],
+            load: [createConfigLoader({ environmentName: environment })],
         }),
-        AppConfigModule,
         MathSolveModule,
         SharedModule,
     ],
