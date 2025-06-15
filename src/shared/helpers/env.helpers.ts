@@ -32,6 +32,10 @@ export const removeUndefinedValues = (obj: any): any => {
     return newObj;
 };
 
-export const getRequiredEnv = <T>(key: string): T => {
-    return process.env[key] as T;
+export const getRequiredEnv = <T>(key: string, type: 'string' | 'number' | 'boolean'): T => {
+    const value = process.env[key];
+    if (!value) return undefined as T;
+
+    if (type === 'number') return parseInt(value, 10) as T;
+    return value as T;
 };

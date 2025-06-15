@@ -12,7 +12,6 @@ export class MathSolveController {
     @UseInterceptors(FileUploadInterceptor)
     @Post('chat')
     solveMathProblem(@UploadedFiles() files: Array<Express.Multer.File>, @Body() body: MathSolveDto) {
-        return 'hola';
         return this.mathSolveService.solveMathProblem(body.prompt, files);
     }
 }
