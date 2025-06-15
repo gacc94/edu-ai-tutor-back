@@ -1,6 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService, Path, PathValue } from '@nestjs/config';
-import { AppConfig } from 'src/app-config/schemas/env-schema';
+import { AppConfig } from 'src/config/schemas/app.schema';
 
 @Injectable()
 export class AppConfigService {

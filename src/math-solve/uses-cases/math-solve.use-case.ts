@@ -1,9 +1,8 @@
-import { GeminiService } from 'src/app-config/services/gemini.service';
+import { GeminiService } from 'src/common/services/gemini.service';
 import { Injectable } from '@nestjs/common';
 import { createPartFromUri, createUserContent } from '@google/genai';
 import { PROMPT_SYSTEM_MATH_SOLVE } from 'src/shared/constants';
 import { File } from '@google/genai';
-import { formatResponse } from 'src/shared/interfaces/api-response.interface';
 
 @Injectable({})
 export class MathSolveUseCase {

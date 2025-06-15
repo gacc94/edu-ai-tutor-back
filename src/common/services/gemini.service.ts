@@ -1,5 +1,5 @@
 import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
-import { AppConfigService } from './app-config.service';
+import { AppConfigService } from '../../config/services/app-config.service';
 import { GoogleGenAI } from '@google/genai';
 
 @Injectable()

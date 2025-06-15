@@ -1,6 +1,6 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import { AppConfigService } from './app-config/services/app-config.service';
+import { AppConfigService } from './config/services/app-config.service';
 import { ValidationPipe } from '@nestjs/common';
 import { json, urlencoded } from 'express';
 
@@ -35,7 +35,7 @@ async function bootstrap() {
 
     await app.listen(port);
     console.log(`Application is running on: ${host}:${port}`);
-    console.log(`Environment: ${name}`);
+    console.log(`Environment: ${name === 'prod' ? 'Production' : 'Development'}`);
 }
 
 bootstrap();
