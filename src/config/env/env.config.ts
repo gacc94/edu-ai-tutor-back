@@ -5,7 +5,7 @@ export const loadConfigFromEnv = (): AppConfig => {
     // Map environment variables to the nested structure expected by the app
     const envVars: Partial<AppConfig> = {
         server: {
-            port: getRequiredEnv('PORT'),
+            port: Number(getRequiredEnv('PORT')),
             host: getRequiredEnv('HOST'),
         },
         env: {
@@ -21,11 +21,11 @@ export const loadConfigFromEnv = (): AppConfig => {
         gemini: {
             apiKey: getRequiredEnv('GEMINI_API_KEY'),
             model: getRequiredEnv('GEMINI_MODEL'),
-            maxTokens: getRequiredEnv('GEMINI_MAX_TOKENS'),
-            temperature: getRequiredEnv('GEMINI_TEMPERATURE'),
-            topP: getRequiredEnv('GEMINI_TOP_P'),
-            frequencyPenalty: getRequiredEnv('GEMINI_FREQUENCY_PENALTY'),
-            presencePenalty: getRequiredEnv('GEMINI_PRESENCE_PENALTY'),
+            maxTokens: Number(getRequiredEnv('GEMINI_MAX_TOKENS') ?? 1000),
+            temperature: Number(getRequiredEnv('GEMINI_TEMPERATURE') ?? 0.8),
+            topP: Number(getRequiredEnv('GEMINI_TOP_P') ?? 0.9),
+            frequencyPenalty: Number(getRequiredEnv('GEMINI_FREQUENCY_PENALTY') ?? 0),
+            presencePenalty: Number(getRequiredEnv('GEMINI_PRESENCE_PENALTY') ?? 0),
             stopSequences: getRequiredEnv('GEMINI_STOP_SEQUENCES'),
         },
         logging: {

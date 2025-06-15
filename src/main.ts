@@ -36,6 +36,7 @@ async function bootstrap() {
     await app.listen(port);
     console.log(`Application is running on: ${host}:${port}`);
     console.log(`Environment: ${name === 'prod' ? 'Production' : 'Development'}`);
+    console.log(`Config file: ${config.get('env.name')}`);
 }
 
 bootstrap();

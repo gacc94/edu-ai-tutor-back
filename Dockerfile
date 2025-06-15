@@ -1,75 +1,75 @@
-#* ================================
-#* BASE STAGE - Configuración común
-#* ================================
-FROM node:22-alpine AS base
-
-# Establecer directorio de trabajo
+ARG NODE_VERSION=22
+#* =============================================
+#* 1. STAGE: BASE - Configuración común mínima
+#* =============================================
+# Usamos una versión específica para builds reproducibles
+FROM node:${NODE_VERSION}-alpine AS base
 WORKDIR /app
+# Habilitar pnpm, que viene con Node >= 16.9
+RUN corepack enable
 
-# Habilitar y preparar pnpm
-RUN corepack enable && corepack prepare pnpm@latest --activate
-
-# Copiar archivos de configuración de pnpm
+#* ========================================================
+#* 2. STAGE: DEV_DEPENDENCIES - Instalar TODAS las dependencias
+#* ========================================================
+# Esta etapa instala todo (dev + prod) y servirá de base para el build y el desarrollo local
+FROM base AS dev-deps
 COPY package.json pnpm-lock.yaml ./
+# Instala TODAS las dependencias. El caché se romperá solo si estos archivos cambian.
+RUN pnpm i --frozen-lockfile
 
-#* ================================
-#* DEPENDENCIES STAGE - Instalar dependencias
-#* ================================
-FROM base AS deps
-
-# Instalar todas las dependencias (dev + prod)
-RUN pnpm i --frozen-lockfilez
-
-#* ================================
-#* DEVELOPMENT STAGE - Para desarrollo
-#* ================================
-FROM deps AS development
-
-# Copiar node_modules desde deps
-COPY --from=deps /app/node_modules ./node_modules
-
-# Copiar código fuente
+#* =============================================
+#* 3. STAGE: DEVELOPMENT - Para desarrollo local
+#* =============================================
+# Esta es la imagen que construirás localmente con --target=development
+FROM dev-deps AS development
+# Copia todo el código fuente. Esto permite el hot-reloading.
 COPY . .
+# Expone el puerto de desarrollo
+ENV PORT=3100
+ENV HOST_PORT=3500
 
-# Exponer puerto
-EXPOSE 3100
-
+EXPOSE ${PORT}
+ 
 # Comando para desarrollo con hot reload
-CMD ["pnpm", "start:dev"]
+CMD ["pnpm", "run", "start:dev"]
 
-#* ==================================
-#* BUILD STAGE - Construir aplicación
-#* ==================================
-FROM deps AS build
-
+#* =============================================
+#* 4. STAGE: BUILD - Compilar el código TypeScript
+#* =============================================
+# Usa la etapa dev-deps como base, que ya tiene todas las dependencias necesarias para compilar.
+FROM dev-deps AS build
+# Copia el código fuente
 COPY . .
-
-# Build de la aplicación
+# Ejecuta el build
 RUN pnpm build
 
-#* ==================================
-#* PRODUCTION STAGE - Para producción
-#* ==================================
-FROM node:22-alpine AS production
+#* ==============================================================
+#* 5. STAGE: PROD_DEPENDENCIES - Preparar dependencias de producción
+#* ==============================================================
+# Usa la etapa de build como base, que ya tiene todo.
+FROM build AS prod-deps
+# 'pnpm prune --prod' es la forma más eficiente de eliminar las devDependencies
+# sin tener que reinstalar todo.
+RUN pnpm prune --prod
 
-WORKDIR /app
-
-# Habilitar pnpm
-RUN corepack enable && corepack prepare pnpm@latest --activate
-
-# Copiar el resultado del build y el package.json
+#* =============================================
+#* 6. STAGE: PRODUCTION - La imagen final y optimizada
+#* =============================================
+FROM base AS production
+# Copia las dependencias de producción ya limpias desde la etapa 'prod-deps'.
+COPY --from=prod-deps /app/node_modules ./node_modules
+# Copia el código compilado desde la etapa 'build'.
 COPY --from=build /app/dist ./dist
-COPY --from=build /app/package.json ./package.json
-COPY --from=build /app/pnpm-lock.yaml ./pnpm-lock.yaml
-
-# Instalar solo dependencias de producción basado en el lockfile
-RUN pnpm i --prod --frozen-lockfile
-
-# Copiar archivos de configuración
+# Copia package.json por si algún paquete lo necesita en runtime.
+COPY package.json .
+# Copia tus archivos de configuración.
 COPY --from=build /app/environments ./environments
 
-# Exponer puerto
-EXPOSE 3200
+# Establece el usuario a 'node' por seguridad.
+USER node
 
-# Comando para producción
-CMD ["node", "dist/main"]
+# Expone el puerto que tu aplicación escuchará
+EXPOSE 3000
+
+# El comando final para ejecutar la aplicación.
+CMD ["node", "dist/main.js"]

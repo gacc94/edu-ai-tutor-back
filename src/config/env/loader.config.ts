@@ -5,7 +5,6 @@ import { existsSync } from 'fs';
 import { AppConfig, appSchema } from '../schemas/app.schema';
 import { deepMerge } from 'src/shared/helpers/env.helpers';
 import { loadConfigFromEnv } from './env.config';
-import { ConfigFactory } from '@nestjs/config';
 
 interface EnvConfigLoaderOptions {
     environmentName: 'dev' | 'prod';
@@ -45,8 +44,3 @@ export class EnvConfigLoader {
             : ({} as Partial<AppConfig>);
     }
 }
-
-export const config: ConfigFactory<AppConfig> = async () =>
-    await new EnvConfigLoader({
-        environmentName: process.env.NODE_ENV === 'prod' ? 'prod' : 'dev',
-    }).validateConfigAsync();
