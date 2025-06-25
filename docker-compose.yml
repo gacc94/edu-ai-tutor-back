@@ -1,20 +1,15 @@
 version: '3.8'
-
 services:
     app:
         container_name: edu-ai-tutor-dev
         build:
-            context: ../
+            context: .
             dockerfile: Dockerfile
             target: development
             tags:
                 - edu-ai-tutor-dev:v1
-        environment:
-            - NODE_ENV=dev
-            - CONFIG_FILE=env.dev.yml
-            - HOST_PORT=3500
-            - PORT=3100
-            - GEMINI_API_KEY=nokey
+        env_file:
+            - .env
         ports:
             - 3500:3100
         # volumes:

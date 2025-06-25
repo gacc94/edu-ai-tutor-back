@@ -28,6 +28,10 @@ export class EnvConfigLoader {
      * ========================================================================================
      */
 
+    /**
+     * Carga la configuración base y la configuración específica del entorno.
+     * @returns La configuración final.
+     */
     private _load(): AppConfig {
         const baseConfig = this._loadConfigFile('env.yml');
         const envConfig = this._loadConfigFile(`env.${this.options.environmentName}.yml`);
@@ -35,7 +39,12 @@ export class EnvConfigLoader {
         return deepMerge(baseConfig, envConfig, envVars);
     }
 
-    // --- MEJORA 3: Crear un método helper para no repetir la lógica de lectura de archivos ---
+    /**
+     * Carga un archivo de configuración YAML y lo devuelve como un objeto parcial de AppConfig.
+     * Si el archivo no existe, devuelve un objeto vacío.
+     * @param fileName
+     * @returns
+     */
     private _loadConfigFile(fileName: string): Partial<AppConfig> {
         const configPath = join(process.cwd(), 'environments', fileName);
 
