@@ -3,6 +3,8 @@ import { ConfigModule } from '@nestjs/config';
 import { MathSolveModule } from './math-solve/math-solve.module';
 import { SharedModule } from './shared/shared.module';
 import appConfig from './config/app.config';
+import { FirebaseModule } from './firebase/firebase.module';
+import { UserModule } from './users/user.module';
 
 @Global()
 @Module({
@@ -13,6 +15,8 @@ import appConfig from './config/app.config';
         }),
         MathSolveModule,
         SharedModule,
+        FirebaseModule,
+        UserModule,
     ],
     controllers: [],
     providers: [],
